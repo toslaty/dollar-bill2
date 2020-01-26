@@ -53,14 +53,12 @@ def prices_to_db(frame, symbol):
 
 #gets fundamentals from database
 def get_funda(sym):
-
-	if(sym == 'ALL'):
-		sym.lower()
-		print(type(sym))
 		
 	connection = engine.connect()
+	dbquery = "SELECT * From " +sym
+
 	try:
-		frame = pa.read_sql('SELECT * FROM '+str(sym), con = engine, index_col = 'index')
+		frame = pa.read_sql(sym, con = engine, index_col = 'index')
 		return frame
 	except Exception as e:
 		print(e)	
@@ -71,7 +69,7 @@ def get_prices(sym,start,end):
 	connect = engine2.connect()
 
 	dbquery = "SELECT Close, dt FROM "+str(sym)+" WHERE dt BETWEEN DATE('"+str(start)+"') AND DATE('"+str(end)+"');"
-
+	print(dbquery)
 	frame = pa.read_sql(dbquery, con = engine2, index_col= 'dt')
 	print(frame)
 
@@ -87,5 +85,4 @@ def get_names():
 	for table_name in the_names:
 		companies.append(table_name)
 	return(companies)
-	print(companies)
 

@@ -28,7 +28,7 @@ def mathemagic(ind):
 	
 	summ1 = ind[ind.columns[0]].sum()
 
-	summ2 = ind[ind.columns[1]].sum(skipna = True)
+	summ2 = ind[ind.columns[1]].sum()
 
 	summ3 = (ind[ind.columns[0]] * ind[ind.columns[1]]).sum()
 
@@ -45,3 +45,24 @@ def mathemagic(ind):
 	correlation = corr1 / corr2
 
 	print(correlation)
+
+
+def average_dx(stock, start, end):
+
+	the_stock = get_prices(stock, start, end)
+
+	print(the_stock)
+
+#add period for RSI testing is 14
+def relative_strength(sym,start, end):
+
+	period = 14
+	stock = get_prices(stock,start,end)
+
+	print(stock)
+
+	avg_gain = 
+	avg_loss =
+
+
+

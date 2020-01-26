@@ -10,6 +10,7 @@ import string
 from dbase import *
 from fundamath import *
 from knoema_req import *
+import json
 
 
 def scrape_wiki_sp500():
@@ -36,11 +37,11 @@ def get_newest():
 
 
 def get_ratios():
+
 	companies = get_names()
 	for i in companies:
 		print(i)
 		get_funda_ratios(i)
-
 
 
 def table_stuff(req):
@@ -48,17 +49,20 @@ def table_stuff(req):
 	supp = bs.BeautifulSoup(req.text, 'html5lib')
 	tables = supp.findAll('table')
 	outputs = []
+	regexp = re.compile('[\.]+')
 
 	for table in tables:
 		for row in table.findAll('tr'):
 			for cell in row.findAll('td'):
-				if(len(row) < 2):
-					pass
-				else:
+				if not(len(row) < 2):
 					first = cell.text
-					outputs.append(first)
+					if(re.search(regexp,first)):
+						first.split('.')
+						outputs.append(first[0])
+					else:
+						outputs.append(first)
 
-	return outputs				
+	return outputs			
 
 
 def check_chars(list):
@@ -74,9 +78,11 @@ def check_chars(list):
 
 def data_to_frame(cols, nlist,clist):
 	
+	print(nlist)
+
 	if(len(cols) == 4):
 		frame = pa.DataFrame(index = clist[5::5], columns = cols)
-		for x in range(4):
+		for x in range(4):#nlist
 			frame[cols[x]] = pa.Series(nlist[x::4], index = clist[5::5])
 
 	elif(len(cols) == 3):
@@ -103,7 +109,7 @@ def real_numbers(alldata):
 	for col in alldata.columns[1:]:
 
 		alldata[col] = alldata[col].replace(',' , '', regex = True)
-		alldata[col] = alldata[col].astype('int64', errors = 'ignore')
+		alldata[col] = alldata[col].astype('int64')
 		alldata[col] = alldata[col] * 1000
 
 	return alldata
@@ -155,7 +161,7 @@ def get_special(symbol):
 
 		print('No data available\n')
 		#takes index from other df to create empty df and fill with 0 for later iteration
-		frame2 = get_funda('ABBV')
+		frame2 = get_funda('ABT')
 
 		empty = pa.DataFrame(columns=['index', 2019, 2018, 2017,2016], index= frame2.index)
 		empty['index'] = frame2.index
@@ -175,3 +181,24 @@ def git_prices(sym, start, end):
 
 	prices_to_db(df ,sym)
 
+def git_mo_prices(sym,start,end):
+
+	req_string = 'https://eodhistoricaldata.com/api/eod/'+sym+'?from='+start+'&to='+end+'&api_token=5cfe8b81ad5ad8.95709345&fmt=json'
+	print(req_string)
+
+	resp = requests.get(req_string)
+
+	patest = pa.read_json(resp.text)
+
+	print(patest)
+	prices_to_db(patest,sym)
+
+def funda_api_test(sym):
+
+	req_string = 'https://eodhistoricaldata.com/api/fundamentals/'+sym+'?api_token=OeAFFmMliFG5orCUuwAKQ8l4WWFQ67YX&filter=Financials::Balance_Sheet::yearly'
+
+	resp = requests.get(req_string)
+	print(resp.text)
+
+	patest2 = pa.read_json(resp.text)
+	print(patest2)

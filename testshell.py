@@ -25,7 +25,11 @@ class Interp(cmd.Cmd):
 		gets the prices from knoema for given symbol, startdate and enddate
 		"""
 		p = line.split(' ')	
-		git_prices(p[0],p[1], p[2])
+		git_mo_prices(p[0],p[1], p[2])
+
+	def do_adx(self,line):
+		com = line.split('')
+		average_dx(stock,start,end)
 
 	#def do_get_most_profitable():	
 
@@ -36,7 +40,7 @@ class Interp(cmd.Cmd):
 	#for testing purpoae after test it will be done automaticly
 	def do_get_fundamental_ratios(self, line):
 		y = line.split(' ')
-		get_funda_ratios(y[0])
+		funda_api_test(y[0])
 
 	def do_test_sql(self,line):
 		"""tests sql to frame for further work"""
@@ -53,6 +57,8 @@ class Interp(cmd.Cmd):
 
 	def do_print(self,line):
 		print('Test')
+
+
 
 
 

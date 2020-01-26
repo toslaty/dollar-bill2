@@ -3,18 +3,13 @@ import datetime as dt
 import math
 import sys
 from testshell import *
-from dbase import checkDB
+import getData
+
 
 
 def main():
 
-	#if not checkDB():
 	#get_newest()
-	#get_ratios()
-
-	#need to write checkDate()
-	#if not checkDate():
-	#	get_all_prices()	
 
 	interpreter = Interp()
 	Interp().cmdloop()
