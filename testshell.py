@@ -41,6 +41,7 @@ class Interp(cmd.Cmd):
 	def do_get_fundamental_ratios(self, line):
 		y = line.split(' ')
 		funda_api_test(y[0])
+		get_funda_ratios(y[0])
 
 	def do_test_sql(self,line):
 		"""tests sql to frame for further work"""

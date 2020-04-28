@@ -61,8 +61,8 @@ def relative_strength(sym,start, end):
 
 	print(stock)
 
-	avg_gain = 
-	avg_loss =
+#	avg_gain = 
+#	avg_loss =
 
 
 

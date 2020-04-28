@@ -5,9 +5,9 @@ from sqlalchemy import inspect
 import pandas as pa
 
 
-engine = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_fundamentals', pool_recycle= 3600) 
+engine = create_engine('mysql://dollar-bill:dollar_bill@localhost/company_fundamentals', pool_recycle= 3600) 
 engine2 = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_daily', pool_recycle= 3600)
-engine3 = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_ratios', pool_recycle = 3600)
+engine3 = create_engine('mysql://dollar-bill:dollar_bill@localhost/company_ratios', pool_recycle = 3600)
 
 def checkDB():
 
@@ -21,12 +21,9 @@ def frame_to_db(frame,symbol):
 			create_database(engine.url, encoding= 'utf8')
 
 	connection = engine.connect()
+	print(frame.index.name)
 
-	frame.reset_index(drop = True, inplace = True)
-	if(len(frame.index) > 10):	
-		frame.drop(frame.index[57], inplace = True)
-
-	frame.to_sql(symbol, con = engine, if_exists='replace', index=True, index_label = 'id')
+	frame.to_sql(symbol, con = engine, if_exists='replace', dtype={frame.index.name:VARCHAR(50)})
 	print(symbol+" is now in Database!")
 
 
@@ -37,7 +34,7 @@ def fundas_to_db(frame, symbol):
 
 	connection = engine3.connect()
 
-	frame.reset_index(inplace = True)
+	frame.set_index('ID')
 	frame.to_sql(symbol, con = engine3, if_exists = 'replace', index = True, index_label = 'id')
 	print(symbol +" ratios in db")
 
@@ -58,7 +55,7 @@ def get_funda(sym):
 	dbquery = "SELECT * From " +sym
 
 	try:
-		frame = pa.read_sql(sym, con = engine, index_col = 'index')
+		frame = pa.read_sql('SELECT * FROM '+str(sym), index_col = 'entry', con = engine)
 		return frame
 	except Exception as e:
 		print(e)	

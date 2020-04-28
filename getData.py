@@ -5,13 +5,16 @@ from datetime import datetime
 import pandas as pa
 import pandas_datareader as web 
 import bs4 as bs
-import re
+import numpy as np
 import string
 from dbase import *
 from fundamath import *
 from knoema_req import *
 import json
 
+#delete after getting it right
+pa.set_option('display.max_columns', 500)
+pa.set_option('display.max_rows', 500)
 
 def scrape_wiki_sp500():
 
@@ -106,11 +109,11 @@ def splitter(rev):
 #kills comma in number cats everything to int64 and times 1000 because numbers o yahoo in thousands
 def real_numbers(alldata):
 
-	for col in alldata.columns[1:]:
+	for col in alldata.iloc[3:]:
 
-		alldata[col] = alldata[col].replace(',' , '', regex = True)
+		alldata[col] = alldata[col].replace({None , 0})
+		print(alldata[col])
 		alldata[col] = alldata[col].astype('int64')
-		alldata[col] = alldata[col] * 1000
 
 	return alldata
 
@@ -195,10 +198,39 @@ def git_mo_prices(sym,start,end):
 
 def funda_api_test(sym):
 
-	req_string = 'https://eodhistoricaldata.com/api/fundamentals/'+sym+'?api_token=OeAFFmMliFG5orCUuwAKQ8l4WWFQ67YX&filter=Financials::Balance_Sheet::yearly'
+	cflow = 'https://eodhistoricaldata.com/api/fundamentals/'+sym+'?api_token=OeAFFmMliFG5orCUuwAKQ8l4WWFQ67YX&filter=Financials::Cash_Flow::yearly'
+	balance = 'https://eodhistoricaldata.com/api/fundamentals/'+sym+'?api_token=OeAFFmMliFG5orCUuwAKQ8l4WWFQ67YX&filter=Financials::Balance_Sheet::yearly'
+	income ='https://eodhistoricaldata.com/api/fundamentals/'+sym+'?api_token=OeAFFmMliFG5orCUuwAKQ8l4WWFQ67YX&filter=Financials::Income_Statement::yearly'
 
-	resp = requests.get(req_string)
-	print(resp.text)
+	resp = requests.get(cflow)
+	resp2 = requests.get(balance)
+	resp3 = requests.get(income)
 
-	patest2 = pa.read_json(resp.text)
-	print(patest2)
+
+	CF_Frame = pa.read_json(resp.text)
+	B_Frame = pa.read_json(resp2.text)
+	I_Frame = pa.read_json(resp3.text)
+
+	frames = (CF_Frame,B_Frame, I_Frame)
+	alldata = pa.concat(frames)
+	alldata.index.name ="entry"
+
+	alldata.replace({None: 0} ,inplace=True)
+	alldata.replace(to_replace=r"\.00$" , value='',inplace=True, regex=True)
+
+	currency = alldata.loc['currency_symbol']
+	currency = currency.iloc[1]
+	
+	Income = alldata.loc['netIncome']
+	Income = Income.iloc[1]
+	Income = Income.astype('int64')
+
+	alldata.drop(['date', 'filing_date','currency_symbol','netIncome'], inplace= True)
+	
+	alldata = alldata.astype('int64')
+	alldata = alldata.append(Income)
+	#Need the currency somewhere
+	#alldata = alldata.append(currency)
+	print(alldata.dtypes)
+
+	frame_to_db(alldata, sym)
