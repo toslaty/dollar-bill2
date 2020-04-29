@@ -184,17 +184,19 @@ def git_prices(sym, start, end):
 
 	prices_to_db(df ,sym)
 
+
 def git_mo_prices(sym,start,end):
 
-	req_string = 'https://eodhistoricaldata.com/api/eod/'+sym+'?from='+start+'&to='+end+'&api_token=5cfe8b81ad5ad8.95709345&fmt=json'
-	print(req_string)
+	req_string = 'https://eodhistoricaldata.com/api/eod/'+sym+'?from='+start+'&to='+end+'&api_token=OeAFFmMliFG5orCUuwAKQ8l4WWFQ67YX&fmt=json'
 
 	resp = requests.get(req_string)
+	print(resp)
 
 	patest = pa.read_json(resp.text)
 
 	print(patest)
 	prices_to_db(patest,sym)
+
 
 def funda_api_test(sym):
 

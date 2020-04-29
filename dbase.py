@@ -6,7 +6,7 @@ import pandas as pa
 
 
 engine = create_engine('mysql://dollar-bill:dollar_bill@localhost/company_fundamentals', pool_recycle= 3600) 
-engine2 = create_engine('mysql://phpmyadmin:Datenbanken@localhost/company_daily', pool_recycle= 3600)
+engine2 = create_engine('mysql://dollar-bill:dollar_bill@localhost/company_daily', pool_recycle= 3600)
 engine3 = create_engine('mysql://dollar-bill:dollar_bill@localhost/company_ratios', pool_recycle = 3600)
 
 def checkDB():
